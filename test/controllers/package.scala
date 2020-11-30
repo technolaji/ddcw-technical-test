@@ -10,19 +10,29 @@ import support.UnitSpec
 
 package object controllers {
 
-  trait ControllerTestResources extends UnitSpec with MockFactory with GuiceOneAppPerSuite {
+  trait ControllerTestResources
+      extends UnitSpec
+      with MockFactory
+      with GuiceOneAppPerSuite {
 
-    implicit override lazy val app: Application = new GuiceApplicationBuilder().build()
+    implicit override lazy val app: Application =
+      new GuiceApplicationBuilder().build()
 
     protected val mockCC: ControllerComponents = stubControllerComponents()
   }
 
-  val message1 = "Message1"
-  val messageJson: JsValue = Json.parse(
-    s"""
-      |{
-      |   "message": "$message1"
-      |}
-    """.stripMargin)
+  def getOperationString(operationType: String, amount: Option[Float]): String = {
+    s"""{ "operationType" : "$operationType", "amount" : ${amount.orNull}}"""
+  }
 
+  def getMessageJson(operationType: String, amount: Option[Float]): JsValue = {
+    val rawMsg = "{ \\\"operationType\\\" : \\\"type\\\", \\\"amount\\\" : 0}"
+    val message = rawMsg.replace("type", operationType).replace("0", amount.getOrElse("null").toString)
+    val messageJson: JsValue = Json.parse(s"""
+         |{
+         |   "message": "$message"
+         |}
+    """.stripMargin)
+    messageJson
+  }
 }
